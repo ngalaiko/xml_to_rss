@@ -17,7 +17,9 @@ def convert(finput):
 	#listing xml offers, converting them to rss items and appending to result
 	for offer in xml.yml_catalog.offers.find_all('offer'):
 		#creating new item
-		rss.rss.channel.insert(0, BeautifulSoup.new_tag(name = 'item', self = rss))
+		#insert after <atom:link>
+		#rss.rss.channel.insert(5, BeautifulSoup.new_tag(name = 'item', self = rss))
+		rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "title"))
 		rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "guid"))
@@ -70,6 +72,13 @@ def clear_folder():
 	for f in files:
 	    os.remove(f)
 
+def count_files():
+	files = glob.glob(path)
+	count = 0
+	for f in files:
+		count += 1
+	return count
+
 #authorization in telegram
 TOKEN = '150331515:AAE-Dbe8DucztItsg5Eh6o1U_g-ZDjnOhck'
 bot = telebot.TeleBot(TOKEN, True)
@@ -86,11 +95,14 @@ def send_help(message):
 def add_file(message):
 	file_info = bot.get_file(message.document.file_id)
 	download_file('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
-	bot.send_message(message.chat.id, 'Файл загружен.')
+	bot.send_message(message.chat.id, 'Файл загружен.\nЗагрузите еще файл или начните обработку командой /convert')
 
 @bot.message_handler(commands = ['convert'])
 def convert_files(message):
 	global ready
+	if count_files() == 0:
+		bot.send_message(message.chat.id, 'Сначала добавьте файлы, для этого просто отправьте их мне.')
+		return
 	if ready:
 		try:
 			ready = False
