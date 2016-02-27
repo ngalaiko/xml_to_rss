@@ -35,10 +35,10 @@ def convert(finput):
 		else:
 			picture_string = 'https://upload.wikimedia.org/wikipedia/commons/9/9a/%D0%9D%D0%B5%D1%82_%D1%84%D0%BE%D1%82%D0%BE.png'
 		if offer.description:
-			description_string = offer.description.string[:256] + '...'
+			description_string = offer.description.string
 		else:
 			description_string = 'Нет описания'
-		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>Читать дальше &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
+		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>Купить тут &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
 		rss.rss.channel.item.pubDate.string = email.utils.formatdate(time.mktime(time.gmtime(int(offer.modified_time.string))))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
