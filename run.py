@@ -7,47 +7,16 @@ import os
 import glob
 
 def convert(finput):
-	#arguments obviously
-	description = 'Описание бла бла бла'
-	img_url = './path/to/img.png'
-	link_to_rss = 'http://link.to.rss/'
-
+	#opening files
 	xml = BeautifulSoup(open(finput, 'r').read(), features = 'xml')
-
 	rss = BeautifulSoup(open('output.xml', 'r').read(), features = 'xml')
-
-	#setting new channel values
-	#title
-	if xml.yml_catalog.shop.company.string:
-		rss.rss.channel.title.string = xml.yml_catalog.shop.company.string
-	else:
-		rss.rss.channel.title.string = 'Без названия'
-	#description
-	rss.rss.channel.description.string = description
-	#languege 
-	rss.rss.channel.language.string = 'ru'
-	#link 
-	rss.rss.channel.link.string = xml.yml_catalog.shop.url.string
-	#pubDate = now
-	rss.rss.channel.pubDate.string = datetime.datetime.strftime(datetime.datetime.now(), '%a, %d %b %Y %H:%M:%S %Z')
-	#image
-	#link
-	rss.rss.channel.image.link.string = rss.rss.channel.link.string
-	#url
-	rss.rss.channel.image.url.string = img_url
-	#title
-	rss.rss.channel.image.title.string = rss.rss.channel.description.string
-	#atom:link
-	rss.rss.channel.find_all('link')[2]['href'] = link_to_rss
-
 	#listing xml categories and remembering them
 	categories = {}
 	for category in xml.yml_catalog.categories.find_all('category'):
 		categories[category['id']] = category.string
 	#listing xml offers, converting them to rss items and appending to result
 	for offer in xml.yml_catalog.offers.find_all('offer'):
-	#offer = xml.yml_catalog.offers.find_all('offer')[0]
-	#creating new item
+		#creating new item
 		rss.rss.channel.append(BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "title"))
 		rss.rss.channel.find_all('item')[-1].title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
@@ -63,7 +32,6 @@ def convert(finput):
 		rss.rss.channel.find_all('item')[-1].author.string = '!!!!!some author' ###########
 		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "category"))
 		rss.rss.channel.find_all('item')[-1].category.string = categories[offer.categoryId.string]
-
 	#write to file
 	output = open('output.xml', 'w')
 	output.write(rss.prettify())
@@ -79,10 +47,11 @@ def download_file(url):
         for chunk in r.iter_content(chunk_size=1024): 
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
-                #f.flush() commented by recommendation from J.F.Sebastian
     return local_filename
 
+#if we are ready to start new convertation
 ready = True
+#path to xml files
 path = './files/*'
 
 def clear_folder():
@@ -90,6 +59,7 @@ def clear_folder():
 	for f in files:
 	    os.remove(f)
 
+#authorization in telegram
 TOKEN = '150331515:AAE-Dbe8DucztItsg5Eh6o1U_g-ZDjnOhck'
 bot = telebot.TeleBot(TOKEN, True)
 
