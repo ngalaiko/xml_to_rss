@@ -16,7 +16,7 @@ def convert(finput):
 	for category in xml.yml_catalog.categories.find_all('category'):
 		categories[category['id']] = category.string
 	#listing xml offers, converting them to rss items and appending to result
-	for offer in xml.yml_catalog.offers.find_all('offer'):
+	for offer in xml.yml_catalog.offers.find_all('offer')[::-1]:
 		#creating new item
 		#insert after <atom:link>
 		rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
