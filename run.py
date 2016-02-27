@@ -17,21 +17,32 @@ def convert(finput):
 	#listing xml offers, converting them to rss items and appending to result
 	for offer in xml.yml_catalog.offers.find_all('offer'):
 		#creating new item
-		rss.rss.channel.append(BeautifulSoup.new_tag(name = 'item', self = rss))
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "title"))
-		rss.rss.channel.find_all('item')[-1].title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "guid"))
-		rss.rss.channel.find_all('item')[-1].guid.string = offer.url.string
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "link"))
-		rss.rss.channel.find_all('item')[-1].link.string = offer.url.string
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "description"))
-		rss.rss.channel.find_all('item')[-1].description.string = CData(offer.description.string[:200] + '<br/><a href=\'' + offer.url.string + '\'>Читать дальше &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + offer.picture.string + '\'/></a>')
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
-		rss.rss.channel.find_all('item')[-1].pubDate.string = '!!!!!!some date' #######
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "author"))
-		rss.rss.channel.find_all('item')[-1].author.string = '!!!!!some author' ###########
-		rss.rss.channel.find_all('item')[-1].append(BeautifulSoup.new_tag(self = rss, name = "category"))
-		rss.rss.channel.find_all('item')[-1].category.string = categories[offer.categoryId.string]
+		rss.rss.channel.insert(0, BeautifulSoup.new_tag(name = 'item', self = rss))
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "title"))
+		rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "guid"))
+		rss.rss.channel.item.guid.string = offer.url.string
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "link"))
+		rss.rss.channel.item.link.string = offer.url.string
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "description"))
+		#check if no description or no picture
+		description_string = ''
+		picture_string = ''
+		if offer.picture:
+			picture_string = offer.picture.string
+		else:
+			picture_string = 'https://upload.wikimedia.org/wikipedia/commons/9/9a/%D0%9D%D0%B5%D1%82_%D1%84%D0%BE%D1%82%D0%BE.png'
+		if offer.description:
+			description_string = offer.description.string[:200]
+		else:
+			description_string = 'Нет описания'
+		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>...Читать дальше &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
+		rss.rss.channel.item.pubDate.string = '!!!!!!some date' #######
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "author"))
+		rss.rss.channel.item.author.string = '!!!!!some author' ###########
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
+		rss.rss.channel.item.category.string = categories[offer.categoryId.string]
 	#write to file
 	output = open('output.xml', 'w')
 	output.write(rss.prettify())
