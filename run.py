@@ -106,6 +106,7 @@ def convert_files(message):
 	if ready:
 		try:
 			ready = False
+			bot.send_message(message.chat.id, 'Обработка началась...')
 			#clean output.xml
 			f1 = open('output.xml', 'w')
 			f2 = open('start.xml', 'r')
