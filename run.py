@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 from bs4 import CData
 import telebot
-import datetime
+import email.utils
+import time
 import requests
 import os
 import glob
@@ -18,7 +19,6 @@ def convert(finput):
 	for offer in xml.yml_catalog.offers.find_all('offer'):
 		#creating new item
 		#insert after <atom:link>
-		#rss.rss.channel.insert(5, BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "title"))
 		rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
@@ -40,9 +40,7 @@ def convert(finput):
 			description_string = 'Нет описания'
 		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>...Читать дальше &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
-		rss.rss.channel.item.pubDate.string = '!!!!!!some date' #######
-		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "author"))
-		rss.rss.channel.item.author.string = '!!!!!some author' ###########
+		rss.rss.channel.item.pubDate.string = email.utils.formatdate(time.mktime(time.gmtime(int(offer.modified_time.string))))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
 		rss.rss.channel.item.category.string = categories[offer.categoryId.string]
 	#write to file
