@@ -29,6 +29,8 @@ while True:
 	#extracting item from sourse and inserting it to target X 50 times
 	for i in range(n):
 		target.rss.channel.append(source.rss.channel.item.extract())
+	#make needed items number again
+	n = items_to_upload
 	#forming uploading file
 	f = open('upload.xml', 'w')
 	f.write(target.prettify())
