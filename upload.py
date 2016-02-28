@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 #ftp parameters
 host = "galayko.netne.net"
 ftp_user = "a8524605"
-ftp_password = "67636510aA+"
+ftp_password = ""
 filename = "./upload.xml"
 time_to_sleep = 30
 items_to_upload = 50
