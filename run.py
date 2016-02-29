@@ -15,9 +15,9 @@ def convert(finput):
 	xml = BeautifulSoup(open(finput, 'r').read(), features = 'xml')
 	rss = BeautifulSoup(open('output.xml', 'r').read(), features = 'xml')
 	#listing xml categories and remembering them
-	###categories = {}
-	###for category in xml.yml_catalog.categories.find_all('category'):
-	###	categories[category['id']] = category.string
+	categories = {}
+	for category in xml.yml_catalog.categories.find_all('category'):
+		categories[category['id']] = category.string
 	#listing xml offers, converting them to rss items and appending to result
 	for offer in xml.yml_catalog.offers.find_all('offer')[::-1]:
 		#creating new item
@@ -44,10 +44,10 @@ def convert(finput):
 		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>Купить тут &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
 		rss.rss.channel.item.pubDate.string = email.utils.formatdate(time.mktime(time.gmtime(int(offer.modified_time.string))))
-		###rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
-		###rss.rss.channel.item.category.string = categories[offer.categoryId.string]
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
-		rss.rss.channel.item.category.string = 'Sale'
+		rss.rss.channel.item.category.string = categories[offer.categoryId.string]
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
+		rss.rss.channel.item.find_all('category')[1].string = 'Sale'
 	#write to file
 	output = open('output.xml', 'w')
 	output.write(rss.prettify())
