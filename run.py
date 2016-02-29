@@ -7,8 +7,31 @@ import requests
 import os
 import glob
 import random
+import subprocess as sub
 
 phrases = ['Секундочку...', 'Подождите...', 'Один момент...', 'Сейчас все будет...', 'Почти готово...', 'Ждем...','Идет обработка...']
+
+f = open('output.xml', 'r')
+
+#ftp parameters
+host = None
+ftp_user = None
+ftp_password = None
+filename = 'upload.xml'
+time_to_sleep = None
+items_to_upload = None
+path_to_folder = None
+
+#form new string to send
+ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+#if we are ready to start new convertation
+ready = True
+#path to xml files
+path = './files/*'
+
+#upload.py process
+proc = None
 
 def convert(finput):
 	#opening files
@@ -63,11 +86,6 @@ def download_file(url):
                 f.write(chunk)
     return local_filename
 
-#if we are ready to start new convertation
-ready = True
-#path to xml files
-path = './files/*'
-
 def clear_folder():
 	files = glob.glob(path)
 	for f in files:
@@ -80,7 +98,7 @@ def count_files():
 		count += 1
 	return count
 
-help_message = '/download - скачать сконвертированный файл\n/count - посчитать, сколько товаров в очереди на добавление\n/clear - очистить очередь'
+help_message = '/download - скачать сконвертированный файл\n/count - посчитать, сколько товаров в очереди на добавление'
 
 #authorization in telegram
 TOKEN = '150331515:AAE-Dbe8DucztItsg5Eh6o1U_g-ZDjnOhck'
@@ -94,14 +112,192 @@ def send_start(message):
 def send_help(message):
 	bot.send_message(message.chat.id, 'Сначала пришлите мне все XML файлы, которые требуется конвертировать в RSS.\nЗатем, вызовите команду /convert для начала конвертации.\n' + help_message)
 
+@bot.message_handler(commands = ['set_host'])
+def set_host(message):
+	global host
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return		
+
+	host = message.text[message.text.find(' ') + 1: ]
+
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
+@bot.message_handler(commands = ['set_user'])
+def set_user(message):
+	global ftp_user
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	ftp_user = message.text[message.text.find(' ') + 1: ]
+
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
+@bot.message_handler(commands = ['set_password'])
+def set_password(message):
+	global ftp_password
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	ftp_password = message.text[message.text.find(' ') + 1: ]
+
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
+@bot.message_handler(commands = ['set_filename'])
+def set_filename(message):
+	global filename
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	buff = message.text[message.text.find(' ') + 1: ]
+	if buff.split('.')[-1] == 'xml' and buff.split('.')[0] != '':
+		filename = buff
+
+		#form new string to send
+		ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+		bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+	else:
+		bot.send_message(message.chat.id, 'Формат файла должен быть .xml')
+
+@bot.message_handler(commands = ['set_time'])
+def set_time(message):
+	global time_to_sleep
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	buff = message.text[message.text.find(' ') + 1: ]
+	try:
+		int(buff)
+	except:
+		bot.send_message(message.chat.id, 'Введите целое число')
+		return
+	time_to_sleep = buff
+
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
+@bot.message_handler(commands = ['set_items'])
+def set_items(message):
+	global items_to_upload
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	buff = message.text[message.text.find(' ') + 1: ]
+	try:
+		int(buff)
+	except:
+		bot.send_message(message.chat.id, 'Введите целое число')
+		return
+	items_to_upload = buff
+
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
+@bot.message_handler(commands = ['set_path'])
+def set_path(message):
+	global path_to_folder
+
+	#check for empty param
+	if message.text.find(' ') < 0:
+		bot.send_message(message.chat.id, 'Пустой аргумент')
+		return
+
+	buff = message.text[message.text.find(' ') + 1: ]
+	if buff[0] == '/':
+		path_to_folder = buff
+
+		#form new string to send
+		ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+		bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+	else:
+		bot.send_message(message.chat.id, 'Путь вида /path/to/folder')
+
+@bot.message_handler(commands = ['start_uploading'])
+def start_uploading(message):
+	global proc 
+
+	if not check_upload():
+		proc = sub.Popen(['python', 'upload.py', '-ftp_host', 'galayko.ru', '-user', 'galayko', '-password', '123', '-time', '2323', '-items', '2324', '-path', '~/', '-filename', 'upload.xml'])
+		bot.send_message(message.chat.id, 'Загрузка началась')
+	else:
+		bot.send_message(message.chat.id, 'Загрузка уже идет')
+
+def check_upload():
+	try:
+		if proc.poll():
+			return False
+		else:
+			return True
+	except:
+		if not proc:
+			return False
+		return True
+
+def stop_upload(chat_id):
+	global proc
+
+	if check_upload():
+		os.kill(proc.pid, sub.signal.SIGKILL)
+		proc = None
+		bot.send_message(chat_id, 'Загрузка остановлена')
+	else:
+		bot.send_message(chat_id, 'Загрузка неактивна')
+
+@bot.message_handler(commands = ['stop_uploading'])
+def stop_uploading(message):
+	stop_upload(message.chat.id)
+
+@bot.message_handler(commands = ['get_params'])
+def get_params(message):
+	#form new string to send
+	ftp_params = 'host: ' + str(host) + '\nuser: ' + str(ftp_user) + '\npassword: ' + str(ftp_password) + '\nИмя файла на ftp сервере: ' + str(filename) + '\nПериод загрузки: ' + str(time_to_sleep) + ' c\nКоличество товаров в файле: ' + str(items_to_upload) + '\nПуть к папке на сервере для загрузки: ' + str(path_to_folder)
+
+	bot.send_message(message.chat.id, 'Установлено:\n' + ftp_params)
+
 @bot.message_handler(content_types = ['document'])
 def add_file(message):
+	stop_upload(message.chat.id)
+
 	file_info = bot.get_file(message.document.file_id)
 	download_file('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
 	bot.send_message(message.chat.id, 'Файл загружен.\nЗагрузите еще файл или начните обработку командой /convert')
 
 @bot.message_handler(commands = ['download'])
 def send_file(message):
+	stop_upload()
+
 	bot.send_message(message.chat.id, random.choice(phrases)) 
 	#send file
 	doc = open('output.xml', 'rb')
@@ -109,6 +305,8 @@ def send_file(message):
 
 @bot.message_handler(commands = ['clear'])
 def send_file(message):
+	stop_upload()
+
 	bot.send_message(message.chat.id, random.choice(phrases)) 
 	#clean output.xml
 	f1 = open('output.xml', 'w')
@@ -129,6 +327,7 @@ def count_items(message):
 @bot.message_handler(commands = ['convert'])
 def convert_files(message):
 	global ready
+
 	if count_files() == 0:
 		bot.send_message(message.chat.id, 'Сначала добавьте файлы, для этого просто отправьте их мне.')
 		return
