@@ -21,7 +21,7 @@ while True:
 	target = BeautifulSoup(open('start.xml', 'r').read(), features = 'xml')
 	#if we have no items at all
 	if len(source.rss.channel.find_all('item')) == 0:
-		sleep(time_to_sleep )
+		time.sleep(time_to_sleep)
 		continue
 	#if we have some items, change number of items to upload
 	if len(source.rss.channel.find_all('item')) < 50:
