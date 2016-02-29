@@ -46,6 +46,8 @@ def convert(finput):
 		rss.rss.channel.item.pubDate.string = email.utils.formatdate(time.mktime(time.gmtime(int(offer.modified_time.string))))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
 		rss.rss.channel.item.category.string = categories[offer.categoryId.string]
+		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
+		rss.rss.channel.item.category.string = 'sale'
 	#write to file
 	output = open('output.xml', 'w')
 	output.write(rss.prettify())
