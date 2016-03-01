@@ -27,8 +27,8 @@ def convert(finput):
 		rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "guid"))
 		rss.rss.channel.item.guid.string = offer.url.string
-		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "link"))
-		rss.rss.channel.item.link.string = offer.url.string
+		###rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "link"))
+		###rss.rss.channel.item.link.string = offer.url.string
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "description"))
 		#check if no description or no picture
 		description_string = ''
@@ -41,7 +41,7 @@ def convert(finput):
 			description_string = offer.description.string[:offer.description.string.find('//')]
 		else:
 			description_string = 'Нет описания'
-		rss.rss.channel.item.description.string = CData(description_string + '<br/><a href=\'' + offer.url.string + '\'>Купить тут &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
+		rss.rss.channel.item.description.string = CData(description_string + '<br/><br/><a href=\'' + offer.url.string + '\'>Купить тут &rarr;</a></br><a href=\'' + offer.url.string + '\'><img src=\'' + picture_string + '\'/></a>')
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "pubDate"))
 		rss.rss.channel.item.pubDate.string = email.utils.formatdate(time.mktime(time.gmtime(int(offer.modified_time.string))))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
