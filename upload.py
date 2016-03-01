@@ -32,7 +32,7 @@ while True:
 	#make needed items number again
 	n = items_to_upload
 	#forming uploading file
-	f = open('upload.xml', 'w')
+	f = open(filename, 'w')
 	f.write(target.prettify())
 	f.close()
 	#sending it
