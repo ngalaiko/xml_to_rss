@@ -24,7 +24,7 @@ while True:
 		time.sleep(1)
 		continue
 	#if we have some items, change number of items to upload
-	if len(source.rss.channel.find_all('item')) < 50:
+	if len(source.rss.channel.find_all('item')) < items_to_upload:
 		n = len(source.rss.channel.find_all('item'))
 	#extracting item from sourse and inserting it to target X 50 times
 	for i in range(n):
