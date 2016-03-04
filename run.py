@@ -29,12 +29,14 @@ def convert(finput):
 			rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
 		else:
 			rss.rss.channel.item.extract()
+			continue
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "guid"))
 		#check for url
 		if offer.url:
 			rss.rss.channel.item.guid.string = offer.url.string
 		else:
 			rss.rss.channel.item.extract()
+			continue
 		###rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "link"))
 		###rss.rss.channel.item.link.string = offer.url.string
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "description"))
