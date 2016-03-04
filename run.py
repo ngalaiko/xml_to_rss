@@ -25,7 +25,7 @@ def convert(finput):
 		rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "title"))
 		#checking for name
-		if offer.name:
+		if len(offer.find_all('name')):
 			rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
 		else:
 			rss.rss.channel.item.extract()
