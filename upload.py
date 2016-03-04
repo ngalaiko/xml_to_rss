@@ -3,13 +3,13 @@ import time
 from bs4 import BeautifulSoup
 
 #ftp parameters
-host = "galayko.netne.net"
-ftp_user = "a8524605"
+host = "agency.dev.e-generator.ru"
+ftp_user = ""
 ftp_password = ""
-filename = "./upload.xml"
-time_to_sleep = 30
-items_to_upload = 50
-path_to_folder = '/test'
+filename = "./sale_rss.xml"
+time_to_sleep = 60 *60 #in sec
+items_to_upload = 75
+path_to_folder = '/s.egenerator.ru'
 
 #var for new number of items if we have less than items_to_upload
 n = items_to_upload
