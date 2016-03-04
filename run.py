@@ -24,7 +24,11 @@ def convert(finput):
 		#insert after <atom:link>
 		rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "title"))
-		rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
+		#checking for name
+		if offer.name:
+			rss.rss.channel.item.title.string = offer.find_all('name')[0].string.replace('&quot;', '\"')
+		else:
+			rss.rss.channel.item.title.string = 'Без названия'
 		rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "guid"))
 		rss.rss.channel.item.guid.string = offer.url.string
 		###rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "link"))
