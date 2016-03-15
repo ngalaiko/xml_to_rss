@@ -11,16 +11,16 @@ import random
 phrases = ['Секундочку...', 'Подождите...', 'Один момент...', 'Сейчас все будет...', 'Почти готово...', 'Ждем...','Идет обработка...']
 
 def convert(finput):
-	try:
-		#opening files
-		xml = BeautifulSoup(open(finput, 'r').read(), features = 'xml')
-		rss = BeautifulSoup(open('output.xml', 'r').read(), features = 'xml')
-		#listing xml categories and remembering them
-		categories = {}
-		for category in xml.yml_catalog.categories.find_all('category'):
-			categories[category['id']] = category.string
-		#listing xml offers, converting them to rss items and appending to result
-		for offer in xml.yml_catalog.offers.find_all('offer')[::-1]:
+	#opening files
+	xml = BeautifulSoup(open(finput, 'r').read(), features = 'xml')
+	rss = BeautifulSoup(open('output.xml', 'r').read(), features = 'xml')
+	#listing xml categories and remembering them
+	categories = {}
+	for category in xml.yml_catalog.categories.find_all('category'):
+		categories[category['id']] = category.string
+	#listing xml offers, converting them to rss items and appending to result
+	for offer in xml.yml_catalog.offers.find_all('offer')[::-1]:
+		try:
 			#creating new item
 			#insert after <atom:link>
 			rss.rss.channel.find_all('link', limit = 3)[2].insert_after(BeautifulSoup.new_tag(name = 'item', self = rss))
@@ -51,9 +51,9 @@ def convert(finput):
 			rss.rss.channel.item.category.string = categories[offer.categoryId.string]
 			rss.rss.channel.item.append(BeautifulSoup.new_tag(self = rss, name = "category"))
 			rss.rss.channel.item.find_all('category')[1].string = 'Sale'
-	except:
-		rss.rss.channel.item.extract()
-		continue
+		except:
+			rss.rss.channel.item.extract()
+			continue
 	#write to file
 	output = open('output.xml', 'w')
 	output.write(rss.prettify())
